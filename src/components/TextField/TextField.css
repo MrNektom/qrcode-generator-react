@@ -1,0 +1,44 @@
+.TextField {
+  position: relative;
+  border: 1px solid grey;
+  border-radius: 8px;
+  margin: 4px;
+  padding: 4px 8px;
+  transition: border-color 0.25s;
+}
+
+.TextField:focus-within,
+.TextField:hover {
+  border-color: var(--color-primary);
+}
+
+.TextField_label {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2px 4px;
+  font-size: 16px;
+  line-height: 16px;
+  background-color: var(--color-background);
+  transform-origin: 0;
+  user-select: none;
+  transform: translate(5px, -11px) scale(0.7);
+  transition: transform 0.25s;
+}
+
+.TextField_input:placeholder-shown:not(:focus) + .TextField_label {
+  transform: translate(8px, 6px) scale(1);
+}
+
+.TextField_input {
+  border: 0;
+}
+
+.TextField_input::placeholder {
+  color: transparent;
+}
+
+.TextField_input:focus {
+  outline: 0;
+}

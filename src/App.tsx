@@ -4,6 +4,7 @@ import "./App.css";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { validateEmail } from "./utils/validateEmail";
 import qrcode from "qrcode-generator";
+import { TextField } from "./components/TextField/TextField";
 
 type TInputs = {
   username: string;
@@ -13,15 +14,18 @@ type TInputs = {
 };
 
 function App() {
-  const [imageTag, setImageTag] = useState("");
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm<TInputs>();
+
+  // const [imageTag, setImageTag] = useState("");
+  const [imageURL, setImageURL] = useState("");
+
   const onSubmit: SubmitHandler<TInputs> = (data) => {
-    const qrc = qrcode(4, "L");
+    const qrc = qrcode(7, "L");
     qrc.addData(`Username: ${data.username}\n`);
     qrc.addData(`Email: ${data.email}\n`);
     if (data.usernameVK.length > 0) {
@@ -31,62 +35,80 @@ function App() {
       qrc.addData(`GitHub: ${data.usernameGitHub}\n`);
     }
     qrc.make();
-    setImageTag(qrc.createSvgTag(4));
+    // setImageTag(qrc.createSvgTag(4));
+    setImageURL(qrc.createDataURL(4));
   };
 
-  function handleCancel() {
+  function onCancel() {
     reset();
-    setImageTag("");
+    setImageURL("");
+    // setImageTag("");
   }
 
   return (
     <div className="App">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="form_fields">
-          <label>Username:</label>
-          <div className="form_field">
-            <input
-              {...register("username", {
-                required: true,
-                minLength: 1,
-              })}
-            />
-            {errors.username && <span>Это обязательное поле</span>}
-          </div>
-          <label>
-            <span>Email:</span>
-            <br />
-          </label>
-          <div className="form_field">
-            <input
-              {...register("email", {
-                required: true,
-                validate: validateEmail,
-              })}
-            />
+      <div className="header">
+        <span>React QR-Code generator</span>
+      </div>
+      <div className="content">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="form_fields">
+            <div className="form_field">
+              <TextField
+                label="Username"
+                {...register("username", {
+                  required: true,
+                  minLength: 1,
+                })}
+              />
+              {errors.username && <span>Это обязательное поле</span>}
+            </div>
+            <div className="form_field">
+              <TextField
+                label="Email"
+                {...register("email", {
+                  required: true,
+                  validate: validateEmail,
+                })}
+              />
 
-            {errors.email && errors.email.type == "required" && (
-              <span>Это обязательное поле</span>
-            )}
-            {errors.email && errors.email.type == "validate" && (
-              <span>
-                В этом поле должен быть корректный адрес электронной почты
-              </span>
-            )}
+              {errors.email && errors.email.type == "required" && (
+                <span>Это обязательное поле</span>
+              )}
+              {errors.email && errors.email.type == "validate" && (
+                <span>
+                  В этом поле должен быть корректный адрес электронной почты
+                </span>
+              )}
+            </div>
+            <div className="form_field">
+              <TextField label="VK" {...register("usernameVK")} />
+            </div>
+            <div className="form_field">
+              <TextField label="GitHub" {...register("usernameGitHub")} />
+            </div>
+            <div className="form_field">
+              <input
+                className="submit_btn form_button"
+                type="submit"
+                value="Создать"
+              />
+            </div>
+            <div className="form_field">
+              <input
+                className="form_button"
+                type="button"
+                value="Отменить"
+                onClick={onCancel}
+              />
+            </div>
           </div>
-          <label>VK:</label>
-          <div className="form_field">
-            <input {...register("usernameVK")} />
-          </div>
-          <label>GitHub:</label>
-          <div className="form_field">
-            <input {...register("usernameGitHub")} />
-          </div>
-        </div>
-        <input className="submit_btn" type="submit" value="Создать" />
-        <input type="button" value="Отменить" onClick={handleCancel} />
-      </form>
-      {imageTag && <div dangerouslySetInnerHTML={{ __html: imageTag }} />}
+        </form>
+        <output>
+          {/* {imageTag && <div dangerouslySetInnerHTML={{ __html: imageTag }} />} */}
+          {imageURL && <img src={imageURL} />}
+        </output>
+      </div>
     </div>
   );
 }
